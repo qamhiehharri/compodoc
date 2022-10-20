@@ -1,6 +1,4 @@
 screenshots/
-tsconfig.json
-rollup/
 test/
 src-refactored/
 coverage
