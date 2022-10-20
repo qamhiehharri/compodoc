@@ -77,6 +77,24 @@ export class ComponentHelper {
         return result;
     }
 
+    public getComponentImports(
+        props: ReadonlyArray<ts.ObjectLiteralElementLike>,
+        srcFile: ts.SourceFile
+    ): Array<IParseDeepIdentifierResult> {
+        return this.symbolHelper
+            .getSymbolDeps(props, 'imports', srcFile)
+            .map(name => this.cleanImportForRootForChild(name))
+            .map(name => this.symbolHelper.parseDeepIndentifier(name));
+    }
+
+    private cleanImportForRootForChild(name: string): string {
+        let nsModule = name.split('.');
+        if (nsModule.length > 0) {
+            name = nsModule[0];
+        }
+        return name;
+    }
+
     public getComponentTemplate(
         props: ReadonlyArray<ts.ObjectLiteralElementLike>,
         srcFile: ts.SourceFile

@@ -46,6 +46,7 @@ export class ComponentDepFactory {
             hostListeners: IO.hostListeners,
 
             standalone: this.helper.getComponentStandalone(props, srcFile),
+            imports: this.helper.getComponentImports(props, srcFile),
 
             description: IO.description,
             rawdescription: IO.rawdescription,
@@ -118,6 +119,7 @@ export interface IComponentDep extends IDep {
     deprecationMessage: string;
 
     standalone: boolean;
+    imports: Array<any>;
 
     entryComponents: Array<any>;
 

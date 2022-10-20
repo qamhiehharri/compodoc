@@ -382,28 +382,9 @@ export class AngularDependencies extends FrameworkDependencies {
                             fileBody
                         );
 
-                        if (this.isModule(visitedDecorator)) {
-                            const moduleDep = new ModuleDepFactory(this.moduleHelper).create(
-                                file,
-                                srcFile,
-                                name,
-                                props,
-                                IO
-                            );
-                            if (RouterParserUtil.hasRouterModuleInImports(moduleDep.imports)) {
-                                RouterParserUtil.addModuleWithRoutes(
-                                    name,
-                                    this.moduleHelper.getModuleImportsRaw(props, srcFile),
-                                    file
-                                );
-                            }
-                            deps = moduleDep;
-                            if (typeof IO.ignore === 'undefined') {
-                                RouterParserUtil.addModule(name, moduleDep.imports);
-                                outputSymbols.modules.push(moduleDep);
-                                outputSymbols.modulesForGraph.push(moduleDep);
-                            }
-                        } else if (this.isComponent(visitedDecorator)) {
+                        let isStandAlone = false;
+
+                        if (this.isComponent(visitedDecorator)) {
                             if (props.length === 0) {
                                 return;
                             }
@@ -415,7 +396,37 @@ export class AngularDependencies extends FrameworkDependencies {
                                 ComponentsTreeEngine.addComponent(componentDep);
                                 outputSymbols.components.push(componentDep);
                             }
-                        } else if (this.isController(visitedDecorator)) {
+
+                            isStandAlone = componentDep.standalone;
+                        }
+
+                         if (this.isModule(visitedDecorator) || isStandAlone) {
+                             const moduleDep = new ModuleDepFactory(this.moduleHelper).create(
+                                 file,
+                                 srcFile,
+                                 name,
+                                 props,
+                                 IO
+                             );
+                             if (RouterParserUtil.hasRouterModuleInImports(moduleDep.imports)) {
+                                 RouterParserUtil.addModuleWithRoutes(
+                                     name,
+                                     this.moduleHelper.getModuleImportsRaw(props, srcFile),
+                                     file
+                                 );
+                             }
+                             deps = moduleDep;
+                             if (typeof IO.ignore === 'undefined') {
+
+                                 if (isStandAlone) {
+                                     moduleDep.type = 'component';
+                                 }
+
+                                 RouterParserUtil.addModule(name, moduleDep.imports);
+                                 outputSymbols.modules.push(moduleDep);
+                                 outputSymbols.modulesForGraph.push(moduleDep);
+                             }
+                         } else if (this.isController(visitedDecorator)) {
                             const controllerDep = new ControllerDepFactory().create(
                                 file,
                                 srcFile,
@@ -521,7 +532,7 @@ export class AngularDependencies extends FrameworkDependencies {
                             if (typeof IO.ignore === 'undefined') {
                                 outputSymbols.directives.push(directiveDeps);
                             }
-                        } else {
+                        } else if (!this.isComponent(visitedDecorator)) {
                             const hasMultipleDecoratorsWithInternalOne =
                                 this.hasInternalDecorator(nodeDecorators);
                             // Just a class

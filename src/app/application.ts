@@ -969,6 +969,12 @@ export class Application {
                                     });
 
                                 case 'component':
+                                    if (['imports', 'exports'].includes(metadataType)) {
+                                        return DependenciesEngine.getModules().some(
+                                            module => (module as any).name === metaDataItem.name
+                                        );
+                                    }
+
                                     return DependenciesEngine.getComponents().some(component => {
                                         let selectedComponent;
                                         if (typeof metaDataItem.id !== 'undefined') {
@@ -1544,6 +1550,10 @@ at least one config for the 'info' or 'source' tab in --navTabConfig.`);
                         depth: 1,
                         pageType: COMPODOC_DEFAULTS.PAGE_TYPES.INTERNAL
                     };
+
+                    let componentAsModule = DependenciesEngine.getModule(component.name);
+
+                    page['component'].module = componentAsModule || {};
 
                     if (component.isDuplicate) {
                         page.name += '-' + component.duplicateId;
