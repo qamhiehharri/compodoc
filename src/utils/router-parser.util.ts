@@ -311,7 +311,7 @@ export class RouterParserUtil {
                         let i = 0;
                         let len = routes.length;
                         let routeAddedOnce = false;
-                        for (i; i < len; i++) {
+                       /* for (i; i < len; i++) {
                             let route = routes[i];
                             if (routes[i].component) {
                                 routeAddedOnce = true;
@@ -321,7 +321,7 @@ export class RouterParserUtil {
                                     path: routes[i].path
                                 });
                             }
-                        }
+                        }*/
                         if (!routeAddedOnce) {
                             routesTree.children = [...routesTree.children, ...routes];
                         }
